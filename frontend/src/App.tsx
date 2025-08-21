@@ -141,6 +141,10 @@ const AppContent = () => {
         );
       case 'profile':
         return isAuthenticated ? <Profile navigate={navigate} /> : <Login navigate={navigate} />;
+      case 'shortlist':
+        return isAuthenticated ? <Shortlist navigate={navigate} /> : <Login navigate={navigate} />;
+      case 'chat':
+        return isAuthenticated ? <Chat navigate={navigate} selectedUniversity={selectedUniversity} /> : <Login navigate={navigate} />;
       default:
         return <NotFound navigate={navigate} />;
     }
