@@ -2,11 +2,11 @@
   "name": "edupath-counsellor-backend",
   "version": "1.0.0",
   "description": "Backend server for EduPath AI University Counsellor",
-  "main": "src/server.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
     "seed": "node data/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
