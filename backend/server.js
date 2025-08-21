@@ -33,42 +33,11 @@ mongoose
 // Middleware
 app.use(helmet());
 app.use(requestId);
-// CORS configuration supporting multiple comma-separated origins and localhost fallback in dev
-const rawOrigins = process.env.CORS_ORIGIN || "";
-const allowedOrigins = rawOrigins
-  .split(",")
-  .map((o) => o.trim().replace(/\/$/, "")) // normalize by removing trailing slash
-  .filter(Boolean);
-
-// Always include deployed backend origin(s)
-const deployOrigins = ["https://edupath-7tab.onrender.com"]; // add more domains here as needed
-deployOrigins.forEach((o) => {
-  if (!allowedOrigins.includes(o)) allowedOrigins.push(o);
-});
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow non-browser / same-origin / curl requests (no origin header)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    // In development allow any localhost:* if not explicitly restricted
-    if (
-      process.env.NODE_ENV !== "production" &&
-      /^(https?:\/\/)?localhost:\d+$/.test(origin)
-    ) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["Content-Length"],
-};
-
-app.use(cors(corsOptions));
-// Handle preflight quickly
-app.options("*", cors(corsOptions));
+// Simplified CORS: allow all origins (temporary for debugging / deployment issue)
+// NOTE: In production you should restrict origins to trusted domains.
+app.use(cors());
+// Optional: explicit preflight handling (not strictly necessary with simple cors())
+app.options("*", cors());
 app.use(express.json());
 
 // Rate limiting
