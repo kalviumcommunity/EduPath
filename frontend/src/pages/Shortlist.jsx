@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const Shortlist = ({ navigate }) => {
+const Shortlist = ({ navigate, setSelectedUniversity }) => {
   const { shortlist, fetchShortlist, removeFromShortlist } = useAuth();
 
   useEffect(() => {
@@ -55,10 +55,7 @@ const Shortlist = ({ navigate }) => {
                   </div>
                 )}
                 <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => navigate(`university/${item.universityId}`)}
-                  >
+                  <Button size="sm" onClick={() => setSelectedUniversity(item)}>
                     View Details
                   </Button>
                   <Button
