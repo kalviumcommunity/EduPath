@@ -17,13 +17,20 @@ import {
   Loader2,
 } from "lucide-react";
 import { universityService } from "@/services/api.service";
-import { useAuth } from '@/contexts/useAuth';
+import { useAuth } from "@/contexts/useAuth";
 import { toast } from "@/components/ui/use-toast";
 import BackButton from "@/components/BackButton";
 
 const UniversityDetails = ({ navigate, selectedUniversity }) => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [university, setUniversity] = useState(selectedUniversity);
+  // Normalize selectedUniversity so we always have an id field
+  const [university, setUniversity] = useState(() => {
+    if (!selectedUniversity) return selectedUniversity;
+    return {
+      ...selectedUniversity,
+      id: selectedUniversity.id || selectedUniversity.universityId, // fallback
+    };
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { addToShortlist } = useAuth();
@@ -39,13 +46,12 @@ const UniversityDetails = ({ navigate, selectedUniversity }) => {
     }
     // Only fetch detailed info if we have a selected university
     const fetchUniversityDetails = async () => {
-      if (!selectedUniversity?.id) return;
+      const selId = selectedUniversity?.id || selectedUniversity?.universityId;
+      if (!selId) return;
 
       setLoading(true);
       try {
-        const response = await universityService.getUniversityById(
-          selectedUniversity.id
-        );
+        const response = await universityService.getUniversityById(selId);
         console.log("RESPONSE:", response);
         if (response.success) {
           // Merge the detailed data with any existing data
@@ -147,7 +153,7 @@ const UniversityDetails = ({ navigate, selectedUniversity }) => {
     >
       {/* Back Button - Top Left Corner */}
       <div className="fixed left-4 top-4 z-50">
-        <BackButton onBack={() => navigate('dashboard')} />
+        <BackButton onBack={() => navigate("dashboard")} />
       </div>
 
       {/* Header Image with Overlay */}
@@ -386,14 +392,20 @@ const UniversityDetails = ({ navigate, selectedUniversity }) => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Button onClick={async () => {
-                  try {
-                    await addToShortlist(university._id || university.id, university.matchScore);
-                    navigate('shortlist');
-                  } catch (e) {
-                    console.error('Add shortlist failed', e);
-                  }
-                }} className="w-full h-12 bg-secondary hover:bg-secondary/90 text-white font-semibold rounded-xl text-lg">
+                <Button
+                  onClick={async () => {
+                    try {
+                      await addToShortlist(
+                        university._id || university.id,
+                        university.matchScore
+                      );
+                      navigate("shortlist");
+                    } catch (e) {
+                      console.error("Add shortlist failed", e);
+                    }
+                  }}
+                  className="w-full h-12 bg-secondary hover:bg-secondary/90 text-white font-semibold rounded-xl text-lg"
+                >
                   Add to My Shortlist
                 </Button>
               </motion.div>

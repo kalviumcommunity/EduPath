@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useAuth } from "@/contexts/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ROUTES } from "@/lib/routes";
 
 const Shortlist = ({ navigate, setSelectedUniversity }) => {
   const { shortlist, fetchShortlist, removeFromShortlist } = useAuth();
@@ -55,7 +56,20 @@ const Shortlist = ({ navigate, setSelectedUniversity }) => {
                   </div>
                 )}
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={() => setSelectedUniversity(item)}>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setSelectedUniversity({
+                        id: item.universityId || item.id,
+                        universityId: item.universityId,
+                        name: item.name,
+                        location: item.location,
+                        matchScore: item.matchScore,
+                        _source: item,
+                      });
+                      navigate(ROUTES.UNIVERSITY_DETAILS);
+                    }}
+                  >
                     View Details
                   </Button>
                   <Button
