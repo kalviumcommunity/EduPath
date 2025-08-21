@@ -1,0 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* EduPath Design System - Professional Color Palette & Typography */
+
+@layer base {
+  :root {
+    /* EduPath Brand Colors */
+    --primary: 214 88% 56%; /* #2563EB - Blue for navigation, active states */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
+    
+    --secondary: 22 93% 54%; /* #F97316 - Orange/Gold for CTAs */
+    --secondary-foreground: 0 0% 100%; /* White text on secondary */
+    
+    --accent: 142 71% 45%; /* #16A34A - Green for success indicators */
+    --accent-foreground: 0 0% 100%; /* White text on accent */
+    
+    /* Neutral Colors */
+    --background: 210 40% 98%; /* #F8FAFC - Very light gray background */
+    --foreground: 215 28% 17%; /* #1E293B - Dark slate for headings */
+    
+    --card: 0 0% 100%; /* White for cards */
+    --card-foreground: 215 28% 17%; /* Dark slate text on cards */
+    
+    --muted: 210 40% 96%; /* Light background for muted elements */
+    --muted-foreground: 215 16% 47%; /* #64748B - Lighter slate for secondary text */
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 17%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 214 32% 91%; /* Light border */
+    --input: 214 32% 91%; /* Input border */
+    --ring: 214 88% 56%; /* Focus ring - primary blue */
+    
+    --radius: 0.75rem; /* Modern border radius */
+    
+    /* Custom Design Tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(214 88% 56%), hsl(214 88% 66%));
+    --gradient-hero: linear-gradient(135deg, hsl(214 88% 56%), hsl(204 94% 65%));
+    --shadow-elegant: 0 10px 30px -10px hsl(214 88% 56% / 0.2);
+    --shadow-card: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+    --shadow-hover: 0 10px 25px -5px hsl(0 0% 0% / 0.1), 0 10px 10px -5px hsl(0 0% 0% / 0.04);
+    
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Sidebar tokens */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 215 28% 17%;
+    --foreground: 210 40% 98%;
+    --card: 215 28% 17%;
+    --card-foreground: 210 40% 98%;
+    --popover: 215 28% 17%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 215 28% 17%;
+    --secondary: 22 93% 54%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 65%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 212 27% 84%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.4s ease-out forwards;
+  }
+
+  .hover-scale {
+    transition: var(--transition-smooth);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  .hover-lift {
+    transition: var(--transition-smooth);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Container utilities */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Button animations */
+  .btn-press {
+    transition: var(--transition-smooth);
+  }
+
+  .btn-press:active {
+    transform: scale(0.98);
+  }
+
+  /* Card styles */
+  .card-elegant {
+    @apply bg-card rounded-xl border shadow-md hover:shadow-lg;
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-smooth);
+  }
+
+  .card-elegant:hover {
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

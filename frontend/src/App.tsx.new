@@ -1,0 +1,89 @@
+import { useState, useEffect } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+
+// Import all pages
+import Index from "./pages/Index";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import PreferenceForm from "./pages/PreferenceForm";
+import Dashboard from "./pages/Dashboard";
+import UniversityDetails from "./pages/UniversityDetails";
+import Profile from "./pages/Profile";
+import NotFound from "./pages/NotFound";
+
+const queryClient = new QueryClient();
+
+// Main app component with routing
+const AppContent = () => {
+  const [currentPage, setCurrentPage] = useState('landing');
+  const [selectedUniversity, setSelectedUniversity] = useState(null);
+  const { isAuthenticated, loading } = useAuth();
+
+  // Redirect to login if not authenticated for protected routes
+  useEffect(() => {
+    const protectedPages = ['preferences', 'dashboard', 'university-details', 'profile'];
+    if (!loading && !isAuthenticated && protectedPages.includes(currentPage)) {
+      setCurrentPage('login');
+    }
+  }, [currentPage, isAuthenticated, loading]);
+
+  const navigate = (page) => {
+    setCurrentPage(page);
+  };
+
+  const renderCurrentPage = () => {
+    if (loading) {
+      return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    }
+
+    switch (currentPage) {
+      case 'landing':
+        return <Index navigate={navigate} />;
+      case 'signup':
+        return <Signup navigate={navigate} />;
+      case 'login':
+        return <Login navigate={navigate} />;
+      case 'preferences':
+        return isAuthenticated ? <PreferenceForm navigate={navigate} /> : <Login navigate={navigate} />;
+      case 'dashboard':
+        return isAuthenticated ? 
+          <Dashboard navigate={navigate} setSelectedUniversity={setSelectedUniversity} /> : 
+          <Login navigate={navigate} />;
+      case 'university-details':
+        return isAuthenticated ? 
+          <UniversityDetails navigate={navigate} selectedUniversity={selectedUniversity} /> : 
+          <Login navigate={navigate} />;
+      case 'profile':
+        return isAuthenticated ? <Profile navigate={navigate} /> : <Login navigate={navigate} />;
+      default:
+        return <NotFound navigate={navigate} />;
+    }
+  };
+
+  return (
+    <>
+      {renderCurrentPage()}
+      <Sonner position="top-right" />
+    </>
+  );
+};
+
+// Root component with providers
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <AppContent />
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
+
+export default App;
