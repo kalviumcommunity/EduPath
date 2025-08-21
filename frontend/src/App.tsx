@@ -15,6 +15,8 @@ import Dashboard from "./pages/Dashboard";
 import UniversityDetails from "./pages/UniversityDetails";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Chat from "./pages/Chat";
+import Shortlist from "./pages/Shortlist";
 
 const queryClient = new QueryClient();
 
