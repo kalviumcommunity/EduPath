@@ -4,7 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // Use JS AuthContext (contains demo fallback logic)
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import { useAuth } from "./contexts/useAuth";
 
 // Import all pages
 import Index from "./pages/Index";
@@ -18,13 +19,27 @@ import NotFound from "./pages/NotFound";
 import Chat from "./pages/Chat";
 import Shortlist from "./pages/Shortlist";
 
+interface SelectedUniversity {
+  id?: string;
+  name?: string;
+  country?: string;
+  [key: string]: unknown;
+}
+
 const queryClient = new QueryClient();
 
 // Main app component with routing
 const AppContent = () => {
   const [currentPage, setCurrentPage] = useState('landing');
   const [previousPage, setPreviousPage] = useState<string | null>(null);
-  const [selectedUniversity, setSelectedUniversity] = useState(null);
+  const [selectedUniversity, setSelectedUniversity] = useState<SelectedUniversity | null>(() => {
+    // hydrate from localStorage if present
+    const stored = localStorage.getItem('selectedUniversity');
+    if (stored) {
+      try { return JSON.parse(stored); } catch { return null; }
+    }
+    return null;
+  });
   const { isAuthenticated, loading, user, postSignup, clearPostSignup } = useAuth();
 
   // Debug logging
@@ -110,6 +125,15 @@ const AppContent = () => {
     setCurrentPage(page);
   };
 
+  // persist selected university
+  useEffect(() => {
+    if (selectedUniversity) {
+      localStorage.setItem('selectedUniversity', JSON.stringify(selectedUniversity));
+    } else {
+      localStorage.removeItem('selectedUniversity');
+    }
+  }, [selectedUniversity]);
+
   const renderCurrentPage = () => {
     if (loading) {
       return <div className="flex items-center justify-center h-screen">Loading...</div>;
@@ -124,23 +148,19 @@ const AppContent = () => {
         return <Login navigate={navigate} />;
       case 'preferences': {
         // Allow immediate access if coming directly from signup before auth flag settles
-        if (isAuthenticated || previousPage === 'signup' || postSignup) {
+  if (isAuthenticated || previousPage === 'signup' || postSignup) {
           return <PreferenceForm navigate={navigate} />;
         }
         return <Login navigate={navigate} />;
       }
       case 'dashboard':
-        return isAuthenticated ? (
-          <Dashboard navigate={navigate} setSelectedUniversity={setSelectedUniversity} />
-        ) : (
-          <Login navigate={navigate} />
-        );
+        return isAuthenticated ? 
+          <Dashboard navigate={navigate} setSelectedUniversity={setSelectedUniversity} /> : 
+          <Login navigate={navigate} />;
       case 'university-details':
-        return isAuthenticated ? (
-          <UniversityDetails navigate={navigate} selectedUniversity={selectedUniversity} />
-        ) : (
-          <Login navigate={navigate} />
-        );
+        return isAuthenticated ? 
+          <UniversityDetails navigate={navigate} selectedUniversity={selectedUniversity} /> : 
+          <Login navigate={navigate} />;
       case 'profile':
         return isAuthenticated ? <Profile navigate={navigate} /> : <Login navigate={navigate} />;
       case 'shortlist':
