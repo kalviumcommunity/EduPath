@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
-import { requestId } from './middleware/requestId.middleware.js';
+import { requestId } from "./middleware/requestId.middleware.js";
 import mongoose from "mongoose";
 import { logger } from "./utils/logger.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -33,36 +33,8 @@ mongoose
 // Middleware
 app.use(helmet());
 app.use(requestId);
-// CORS configuration supporting multiple comma-separated origins and localhost fallback in dev
-const rawOrigins = process.env.CORS_ORIGIN || "";
-const allowedOrigins = rawOrigins
-  .split(",")
-  .map((o) => o.trim())
-  .filter(Boolean);
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow non-browser / same-origin / curl requests (no origin header)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    // In development allow any localhost:* if not explicitly restricted
-    if (
-      process.env.NODE_ENV !== "production" &&
-      /^(https?:\/\/)?localhost:\d+$/.test(origin)
-    ) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["Content-Length"],
-};
-
-app.use(cors(corsOptions));
-// Handle preflight quickly
-app.options("*", cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 // Rate limiting
@@ -82,11 +54,20 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Simple request logging (method, path, duration)
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
   const start = Date.now();
-  res.on('finish', ()=>{
-    const duration = Date.now()-start;
-    logger.info({ reqId: req.id, method: req.method, path: req.originalUrl, status: res.statusCode, duration }, 'request_complete');
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    logger.info(
+      {
+        reqId: req.id,
+        method: req.method,
+        path: req.originalUrl,
+        status: res.statusCode,
+        duration,
+      },
+      "request_complete"
+    );
   });
   next();
 });
@@ -119,23 +100,33 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
   // Background enrichment every 6 hours (non-blocking, best-effort)
-  const intervalMs = (parseInt(process.env.ENRICH_INTERVAL_HOURS)||6) * 60 * 60 * 1000;
+  const intervalMs =
+    (parseInt(process.env.ENRICH_INTERVAL_HOURS) || 6) * 60 * 60 * 1000;
   setInterval(async () => {
     try {
-      const distinctCountries = await University.distinct('location.country');
+      const distinctCountries = await University.distinct("location.country");
       const targetCountries = distinctCountries.filter(Boolean).slice(0, 10); // cap
-      const targetFields = ['Engineering','Science','Medicine','Commerce','Arts'];
+      const targetFields = [
+        "Engineering",
+        "Science",
+        "Medicine",
+        "Commerce",
+        "Arts",
+      ];
       for (const country of targetCountries) {
         for (const field of targetFields) {
-          const count = await University.countDocuments({ 'location.country': country, 'courses.field': field });
+          const count = await University.countDocuments({
+            "location.country": country,
+            "courses.field": field,
+          });
           if (count < 5) {
             await ingestCountryUniversities(country, { field, force: true });
-            logger.info({ country, field }, 'background_enrichment');
+            logger.info({ country, field }, "background_enrichment");
           }
         }
       }
     } catch (e) {
-      logger.warn({ err: e.message }, 'background_enrichment_failed');
+      logger.warn({ err: e.message }, "background_enrichment_failed");
     }
   }, intervalMs).unref();
 });
