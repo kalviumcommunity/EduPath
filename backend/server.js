@@ -37,8 +37,14 @@ app.use(requestId);
 const rawOrigins = process.env.CORS_ORIGIN || "";
 const allowedOrigins = rawOrigins
   .split(",")
-  .map((o) => o.trim())
+  .map((o) => o.trim().replace(/\/$/, "")) // normalize by removing trailing slash
   .filter(Boolean);
+
+// Always include deployed backend origin(s)
+const deployOrigins = ["https://edupath-7tab.onrender.com"]; // add more domains here as needed
+deployOrigins.forEach((o) => {
+  if (!allowedOrigins.includes(o)) allowedOrigins.push(o);
+});
 
 const corsOptions = {
   origin: (origin, callback) => {
